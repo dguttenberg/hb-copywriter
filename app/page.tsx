@@ -29,7 +29,7 @@ const PHASES = [
   "Activating brand knowledge...",
   "Classifying intent...",
   "Assembling context package...",
-  "Generating headline copy...",
+  "Copywriting agent generating headlines...",
   "Selecting imagery...",
   "Building spreadsheet...",
   "Finalizing export...",
@@ -297,7 +297,7 @@ export default function CopywriterPage() {
                 </p>
                 <p style={styles.loadingSubtext}>
                   This takes 30–60 seconds. The Nucleus is assembling brand
-                  context, then Claude generates {numVersions} headline
+                  context, then the copywriting agent generates {numVersions} headline
                   variations.
                 </p>
               </div>
@@ -336,7 +336,7 @@ export default function CopywriterPage() {
                 <p style={styles.emptyText}>
                   Fill in the brief and hit generate. The system will call the
                   Brand Nucleus for context, generate headline copy through
-                  Claude, assign images from the asset library, and export an
+                  the copywriting agent, assign images from the asset library, and export an
                   XLSX file formatted for CreateTotally.
                 </p>
                 <div style={styles.flowDiagram}>
@@ -344,7 +344,7 @@ export default function CopywriterPage() {
                   <span style={styles.flowArrow}>&#8594;</span>
                   <span style={styles.flowStep}>Nucleus</span>
                   <span style={styles.flowArrow}>&#8594;</span>
-                  <span style={styles.flowStep}>Claude</span>
+                  <span style={styles.flowStep}>Copywriter</span>
                   <span style={styles.flowArrow}>&#8594;</span>
                   <span style={styles.flowStep}>XLSX</span>
                 </div>
