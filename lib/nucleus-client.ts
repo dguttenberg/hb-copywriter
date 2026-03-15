@@ -5,8 +5,8 @@ export async function callNucleus(
   channel: string,
   additionalNotes: string
 ): Promise<NucleusResponse> {
-  const nucleusUrl = process.env.NUCLEUS_URL;
-  if (!nucleusUrl) throw new Error("NUCLEUS_URL not configured");
+  const nucleusUrl = process.env.NUCLEUS_ENDPOINT;
+  if (!nucleusUrl) throw new Error("NUCLEUS_ENDPOINT not configured");
 
   const requestText = additionalNotes
     ? `${objective}. Additional context: ${additionalNotes}`
