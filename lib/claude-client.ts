@@ -2,12 +2,9 @@ import Anthropic from "@anthropic-ai/sdk";
 import { ContextPackage, CopyRow } from "./types";
 import { IMAGE_ASSETS } from "./image-mapping";
 
-function buildSystemPrompt(ctx: ContextPackage): string {
-  const products = IMAGE_ASSETS.map((img) => img.product).join(", ");
-  const clothingOptions = [
-    ...new Set(IMAGE_ASSETS.map((img) => img.clothing)),
-  ].join(", ");
+// ─── Phase 1: Write headlines freely (NO product thinking) ───
 
+function buildWritingPrompt(ctx: ContextPackage): string {
   return `You are a senior creative copywriter at an ad agency. You write headline copy for Hamilton Beach's "Yes You Can Chef" social campaign. Your output will be stamped into bold, variable-width stacked typography on 9x16 social static ads.
 
 YOU ARE NOT A STRATEGIST. You are a WRITER. The strategic context below is your brief — absorb it, then FORGET the language it uses. Your job is to write headlines that a 27-year-old scrolling Instagram would stop for. Not headlines that sound like a creative brief read aloud.
@@ -78,12 +75,54 @@ PRACTICAL RULES:
 - Punctuation is rare. No periods. Occasional comma or apostrophe only.
 - Contractions are good (DON'T, ISN'T, WON'T)
 
-IMAGE SELECTION:
-For each headline, pick which product it best pairs with from: ${products}
-Also pick a clothing/vibe context from: ${clothingOptions}`;
+IMPORTANT: Do NOT think about specific products or appliances when writing. Write about the MOMENTS, FEELINGS, and OCCASIONS of cooking and eating. The imagery will be paired separately — your only job is the words.`;
 }
 
-function extractJSON(text: string): CopyRow[] {
+// ─── Phase 2: Self-check for quality ───
+
+const SELF_CHECK_SYSTEM = `You are a creative director reviewing headline copy for Hamilton Beach social ads. Your job is to QC a batch of headlines and fix any that don't work.
+
+A headline FAILS if:
+1. It doesn't make sense when read aloud as a standalone phrase
+2. It combines two unrelated concepts awkwardly (e.g., coffee + gym, smoothie + toast)
+3. It sounds like a brand strategy document, not an ad headline
+4. It's generic enough to be for any brand ("COOK WITH CONFIDENCE")
+5. The line breaks create an awkward reading rhythm
+6. It accidentally implies something weird or unintentional
+
+A headline PASSES if:
+- A person scrolling Instagram would understand it instantly
+- It makes them feel something specific (humor, craving, recognition, warmth)
+- It sounds like something a witty friend would say, not a brand manager
+
+For each headline, decide: PASS or REWRITE. If REWRITE, replace it with something that fixes the problem while keeping the same energy/variety as the batch.`;
+
+// ─── Phase 3: Assign images based on copy vibe ───
+
+function buildImageAssignmentPrompt(): string {
+  const imageDescriptions = IMAGE_ASSETS.map(
+    (img) =>
+      `• ${img.product} (${img.file_name}): ${img.model} in a ${img.kitchen}, dressed ${img.clothing}`
+  ).join("\n");
+
+  return `You are a creative director pairing headlines with photography for social ads. Given a batch of headlines, assign each one to the most natural-feeling photo.
+
+Available photos:
+${imageDescriptions}
+
+RULES:
+- Match based on the VIBE and MOMENT the headline evokes, not literal product mentions
+- A headline about morning energy could pair with Coffee OR Blender — pick what feels most natural
+- A headline about hosting friends could pair with Airfryer (group cooking) or any product really
+- Don't overthink it — if the headline is about a cozy moment, the "Weekend at Home" shots work
+- If the headline has an energetic/active vibe, "Before a Workout" or "Leaving for Work" shots work
+- Spread the photos across the batch — don't put all headlines on one image
+- When in doubt, go with what LOOKS best as an ad, not what's most "correct"`;
+}
+
+// ─── JSON extraction (shared) ───
+
+function extractJSON<T>(text: string): T {
   let jsonStr = text;
   if (text.includes("```json")) {
     jsonStr = text.split("```json")[1].split("```")[0];
@@ -115,8 +154,29 @@ function extractJSON(text: string): CopyRow[] {
         return JSON.parse(repaired);
       }
     }
-    throw new Error("Could not parse Claude response as JSON");
+    throw new Error("Could not parse response as JSON");
   }
+}
+
+// ─── Main pipeline ───
+
+interface RawHeadline {
+  Line1a: string;
+  Line2a: string;
+  Line3a: string;
+}
+
+interface CheckedHeadline {
+  Line1a: string;
+  Line2a: string;
+  Line3a: string;
+  status: "PASS" | "REWRITE";
+}
+
+interface ImageAssignment {
+  index: number;
+  product_match: string;
+  clothing_context: string;
 }
 
 export async function generateCopy(
@@ -125,9 +185,18 @@ export async function generateCopy(
   channel: string
 ): Promise<CopyRow[]> {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const systemPrompt = buildSystemPrompt(contextPackage);
 
-  const userPrompt = `Write ${numVersions} headlines for Hamilton Beach "Yes You Can Chef" social static ads on ${channel}.
+  // ── PHASE 1: Write headlines freely ──
+  const writingPrompt = buildWritingPrompt(contextPackage);
+
+  const writeResponse = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 4000,
+    system: writingPrompt,
+    messages: [
+      {
+        role: "user",
+        content: `Write ${numVersions} headlines for Hamilton Beach "Yes You Can Chef" social static ads on ${channel}.
 
 VARIETY — across the batch:
 - Mix entry points: some lead with the food, some with the moment, some with the person, some with attitude
@@ -136,7 +205,45 @@ VARIETY — across the batch:
 - At least 2 that use a clever turn of phrase or wordplay
 - At least 2 that are just 2 lines (short and punchy, Line3a = "")
 - At least 1 that leans into an honest limitation ("NOT GONNA WIN / A COOKING SHOW / BUT DINNER'S READY")
-- Spread across products — don't cluster all on one appliance
+
+Return ONLY a JSON array:
+[
+  {
+    "Line1a": "FIRST LINE",
+    "Line2a": "SECOND LINE",
+    "Line3a": "THIRD LINE OR EMPTY STRING"
+  }
+]
+
+Exactly ${numVersions} objects. No commentary. No product names in the output — just the headline text.`,
+      },
+    ],
+  });
+
+  const writeText =
+    writeResponse.content[0].type === "text"
+      ? writeResponse.content[0].text
+      : "";
+  const rawHeadlines = extractJSON<RawHeadline[]>(writeText);
+
+  // ── PHASE 2: Self-check ──
+  const headlineList = rawHeadlines
+    .map(
+      (h, i) =>
+        `${i + 1}. "${h.Line1a}" / "${h.Line2a}"${h.Line3a ? ` / "${h.Line3a}"` : ""}`
+    )
+    .join("\n");
+
+  const checkResponse = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 4000,
+    system: SELF_CHECK_SYSTEM,
+    messages: [
+      {
+        role: "user",
+        content: `Review these ${rawHeadlines.length} headlines. For each one, return PASS with the original text or REWRITE with improved text.
+
+${headlineList}
 
 Return ONLY a JSON array:
 [
@@ -144,21 +251,86 @@ Return ONLY a JSON array:
     "Line1a": "FIRST LINE",
     "Line2a": "SECOND LINE",
     "Line3a": "THIRD LINE OR EMPTY STRING",
-    "product_match": "Coffee|Toaster|Blender|Airfryer",
-    "clothing_context": "Weekend at Home|Leaving for Work|Before a Workout"
+    "status": "PASS or REWRITE"
   }
 ]
 
-Exactly ${numVersions} objects. No commentary.`;
-
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 4000,
-    system: systemPrompt,
-    messages: [{ role: "user", content: userPrompt }],
+Exactly ${rawHeadlines.length} objects. Preserve the order. Only rewrite the ones that truly need it — most should PASS.`,
+      },
+    ],
   });
 
-  const text =
-    response.content[0].type === "text" ? response.content[0].text : "";
-  return extractJSON(text);
+  const checkText =
+    checkResponse.content[0].type === "text"
+      ? checkResponse.content[0].text
+      : "";
+  const checkedHeadlines = extractJSON<CheckedHeadline[]>(checkText);
+
+  // Use checked versions (which include any rewrites)
+  const finalHeadlines: RawHeadline[] = checkedHeadlines.map((h) => ({
+    Line1a: h.Line1a,
+    Line2a: h.Line2a,
+    Line3a: h.Line3a,
+  }));
+
+  // ── PHASE 3: Assign images ──
+  const imagePrompt = buildImageAssignmentPrompt();
+  const products = IMAGE_ASSETS.map((img) => img.product).join(", ");
+  const clothingOptions = [
+    ...new Set(IMAGE_ASSETS.map((img) => img.clothing)),
+  ].join(", ");
+
+  const finalList = finalHeadlines
+    .map(
+      (h, i) =>
+        `${i + 1}. "${h.Line1a}" / "${h.Line2a}"${h.Line3a ? ` / "${h.Line3a}"` : ""}`
+    )
+    .join("\n");
+
+  const imageResponse = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 2000,
+    system: imagePrompt,
+    messages: [
+      {
+        role: "user",
+        content: `Assign photos to these ${finalHeadlines.length} headlines:
+
+${finalList}
+
+For each headline, pick the best product photo and clothing context.
+
+Return ONLY a JSON array:
+[
+  {
+    "index": 0,
+    "product_match": "${products}",
+    "clothing_context": "${clothingOptions}"
+  }
+]
+
+Use 0-based indexing. Exactly ${finalHeadlines.length} objects. Spread across different photos — no more than ${Math.ceil(finalHeadlines.length / IMAGE_ASSETS.length) + 1} headlines per photo.`,
+      },
+    ],
+  });
+
+  const imageText =
+    imageResponse.content[0].type === "text"
+      ? imageResponse.content[0].text
+      : "";
+  const imageAssignments = extractJSON<ImageAssignment[]>(imageText);
+
+  // ── Combine into final CopyRows ──
+  const copyRows: CopyRow[] = finalHeadlines.map((headline, i) => {
+    const assignment = imageAssignments.find((a) => a.index === i);
+    return {
+      Line1a: headline.Line1a,
+      Line2a: headline.Line2a,
+      Line3a: headline.Line3a,
+      product_match: assignment?.product_match || "Coffee",
+      clothing_context: assignment?.clothing_context || "Weekend at Home",
+    };
+  });
+
+  return copyRows;
 }
