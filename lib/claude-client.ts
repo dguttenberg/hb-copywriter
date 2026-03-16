@@ -2,111 +2,120 @@ import Anthropic from "@anthropic-ai/sdk";
 import { ContextPackage, CopyRow } from "./types";
 import { IMAGE_ASSETS } from "./image-mapping";
 
-// ─── Phase 1: Write headlines with personality ───
+// ─── Distill the Nucleus context into a short creative brief ───
+
+function distillBrief(ctx: ContextPackage): string {
+  // Pull just the essentials — audience, mindset, tone, and guardrails
+  // Everything else is noise that pushes the agent toward strategy-speak
+  return `Write for: ${ctx.audience_context.who}. ${ctx.audience_context.mindset}. They need to feel: ${ctx.audience_context.what_they_need}.
+
+Tone: ${ctx.tone_direction.register}. Sounds like: ${ctx.tone_direction.sounds_like}. Does NOT sound like: ${ctx.tone_direction.does_not_sound_like}.
+
+Avoid: ${ctx.do_not.slice(0, 5).join("; ")}.`;
+}
+
+// ─── Phase 1: Write headlines ───
 
 function buildWritingPrompt(ctx: ContextPackage): string {
-  return `You are a senior creative copywriter at an ad agency. You write headline copy for Hamilton Beach's "Yes You Can Chef" social campaign — bold, stacked text on 9x16 social static ads over photos of real people in real kitchens.
+  const brief = distillBrief(ctx);
+
+  return `You are a copywriter on the Hamilton Beach "Yes You Can Chef" campaign. Bold stacked text on 9x16 social ads over photos of real people in real kitchens.
+
+BRIEF:
+${brief}
 
 ═══════════════════════════════════════════
-YOUR BRIEF
+HEADLINES THE CREATIVE TEAM LOVED
 ═══════════════════════════════════════════
 
-Objective: ${ctx.objective}
+These are organized by WHY they work. Study the patterns, then write new ones.
 
-Who we're talking to: ${ctx.audience_context.who}
-Their mindset: ${ctx.audience_context.mindset}
-What they need to feel: ${ctx.audience_context.what_they_need}
+WORDPLAY & PUNS — a familiar word or phrase gets a cooking twist:
+- "SOUP-ER" / "EASY"
+- "MAKE IT LOOK" / "OVER EASY" → "over easy" = eggs + effortless
+- "WHISK IT" / "FOR THE" / "BISCUIT"
+- "READY SET" / "BLEND"
+- "YOUR GO-TO'S" / "GO-TOS"
+- "FRY FIRST," / "ASK QUESTIONS" / "LATER"
 
-Tone: ${ctx.tone_direction.register}
-Sounds like: ${ctx.tone_direction.sounds_like}
-Does NOT sound like: ${ctx.tone_direction.does_not_sound_like}
+SELF-AWARE HUMOR — admitting imperfection with a wink:
+- "MADE IT" / "FROM SCRATCH" / "MOSTLY"
+- "FIRST TIME" / "HOSTING." / "YOU SURVIVED"
+- "IMPERFECT" / "STILL COUNTS"
+- "MESSY, BUT" / "STILL DELICIOUS"
+- "IT WASN'T" / "COMPLICATED" / "IT JUST LOOKED LIKE IT"
+- "NOT BAD" / "FOR A TUESDAY"
 
-Copy rules:
-${ctx.copy_rules.map((r, i) => `${i + 1}. ${r}`).join("\n")}
+SPECIFIC LIFE MOMENTS — you can picture the exact scene:
+- "NEW APARTMENT" / "FIRST MEAL"
+- "ADULTHOOD" / "SMELLS LIKE" / "GARLIC"
+- "YOU WERE" / "AT WORK." / "IT COOKED"
+- "YOUR FRIEND'S" / "FAVORITE" / "HAPPY HOUR"
+- "BE YOUR FRIENDS'" / "FAVORITE BARTENDER"
+- "GLUTEN FREE" / "HAPPY BIRTHDAY"
 
-Voice calibration:
-${ctx.voice_calibration}
+CONFIDENT & SHORT — swagger in 2–3 words:
+- "FRY EM'" / "COWBOY"
+- "MEAL PREP" / "MVP"
+- "IMPRESS" / "YOURSELF"
+- "SMOOTHIE" / "GAME:" / "UNDEFEATED"
+- "BLEND IT" / "LIKE YOU" / "MEAN IT"
 
-Use cases to draw from: ${ctx.content_inputs.use_cases.join("; ")}
+ASPIRATIONAL BUT ACCESSIBLE — you pulled off something real:
+- "YOU DID" / "WELLINGTON"
+- "YOU HAVE" / "A SIGNATURE" / "DISH NOW"
+- "GLUTEN FREE PIZZA" / "FROM SCRATCH"
+- "THE PERFECT" / "GOLDEN" / "BROWN"
 
-Never do:
-${ctx.do_not.map((d) => `- ${d}`).join("\n")}
+THE PATTERNS:
+1. Most are 2–5 words total. Short hits hardest.
+2. The best ones make you SMILE or NOD — they're recognizable moments.
+3. Self-awareness > confidence > cleverness. "MOSTLY" is funnier than trying to be witty.
+4. The product is NEVER in the words. It's in the photo.
+5. Each headline works as something you'd actually say to a friend.
 
-═══════════════════════════════════════════
-THE WORK
-═══════════════════════════════════════════
-
-Here are the APPROVED headlines for this campaign. This is the quality bar. Study the ATTITUDE, the WORDPLAY, and the VOICE — then write NEW headlines at this level:
-
-- "YOUR GO-TO'S" / "GO-TOS" → simple meal, featuring the appliance
-- "YOU DID" / "WELLINGTON" → beef wellington image, aspirational but accessible
-- "MAKE IT LOOK" / "OVER EASY" → wordplay (over easy eggs + effortless), big breakfast image
-- "SO GOOD YOUR HAIR" / "MIGHT TURN BLUE" → unexpected, specialty latte image
-- "FRY EM'" / "COWBOY" → two words, pure attitude, air fryer
-- "IMPRESS" / "YOURSELF" → simple, warm, panini press
-- "MEAL PREP" / "MVP" → three words, confident, familiar abbreviation
-- "SOUP-ER" / "EASY" → pun, playful, dead simple
-- "READY SET" / "BLEND" → familiar phrase, recontextualized
-- "YOUR FRIEND'S" / "FAVORITE" / "HAPPY HOUR" → specific, social occasion
-- "BE YOUR FRIENDS'" / "FAVORITE BARTENDER" → social, specific role
-- "GLUTEN FREE PIZZA" / "FROM SCRATCH" → specific food moment, achievement
-- "GLUTEN FREE" / "HAPPY BIRTHDAY" → specific, emotional, celebratory
-- "YOUR PERSONAL" / "SOUS CHEF" → clever role metaphor
-- "MAKE IT BETTER" / "AT HOME" → simple, confident
-- "DINNER FOR THE WEEK" / "WITH ONE BUTTON" → specific benefit, effortless
-
-WHAT MAKES THESE WORK:
-- They're SHORT. Most are 2–4 words. "FRY EM' COWBOY" is two words and it's the best one.
-- They use WORDPLAY and PUNS. "Over easy," "soup-er," "go-to's go-tos" — playful, not trying too hard.
-- They reference SPECIFIC MOMENTS. "Happy birthday," "happy hour," "favorite bartender" — you can picture the exact scene.
-- They're CONFIDENT without being loud. "Impress yourself," "MVP," "you did wellington."
-- Some are ASPIRATIONAL but ACCESSIBLE. "You did wellington" says "you pulled off something fancy" without being intimidating.
-- They never explain the product. The appliance is in the IMAGE, not the words.
-
-DO NOT REUSE ANY OF THESE HEADLINES. Write completely original ones with the same energy.
+DO NOT REUSE ANY OF THESE. Write completely original headlines using these same patterns.
 
 FORMAT:
-- Each headline is 2–3 lines (Line1a, Line2a, Line3a)
-- Line3a can be empty for a punchy 2-liner
-- ALL CAPS always
-- 2–5 words per line
-- Total: 4–8 words per headline
-- The last line carries the weight — that's where the beat drops
-- No periods. Rare punctuation. Contractions welcome.`;
+- 2–3 lines (Line1a, Line2a, Line3a). Line3a can be empty.
+- ALL CAPS. 2–5 words per line. 3–8 words total.
+- Last line carries the weight.
+- Rare punctuation. No periods except for dramatic effect. Contractions welcome.`;
 }
 
 // ─── Phase 2: Creative Director QC ───
 
-const CD_REVIEW_SYSTEM = `You are creative directing Hamilton Beach "Yes You Can Chef" social ads. You're reviewing a batch of headlines against the approved quality bar.
+const CD_REVIEW_SYSTEM = `You are creative directing Hamilton Beach "Yes You Can Chef" social ads.
 
-THE QUALITY BAR — these headlines got approved by the creative team:
-- "FRY EM' COWBOY"
-- "MAKE IT LOOK OVER EASY"
-- "SOUP-ER EASY"
-- "READY SET BLEND"
-- "YOUR FRIEND'S FAVORITE HAPPY HOUR"
-- "MEAL PREP MVP"
-- "GLUTEN FREE HAPPY BIRTHDAY"
-- "YOU DID WELLINGTON"
-- "IMPRESS YOURSELF"
+THE QUALITY BAR — the creative team's favorite headlines from this campaign:
+- "FRY EM' COWBOY" — pure attitude, two words
+- "MADE IT FROM SCRATCH MOSTLY" — self-aware, funny, honest
+- "ADULTHOOD SMELLS LIKE GARLIC" — unexpected, specific, you can picture it
+- "SOUP-ER EASY" — pun, playful, effortless
+- "NEW APARTMENT FIRST MEAL" — specific life moment
+- "NOT BAD FOR A TUESDAY" — understated, specific day
+- "YOU DID WELLINGTON" — aspirational but accessible
+- "WHISK IT FOR THE BISCUIT" — wordplay
+- "FIRST TIME HOSTING. YOU SURVIVED" — self-aware humor
 
-What makes those work: WORDPLAY + BREVITY + SPECIFIC MOMENTS. They're playful. They're short. They sound like a person being clever, not a brand trying to be clever. Most are 2–4 words.
+WHAT THE TEAM RESPONDS TO:
+1. Lines that make them smile or nod — recognizable moments
+2. Self-aware humor beats trying to be clever
+3. Short and specific beats long and smart
+4. They should work as something you'd actually say
 
-For each headline in the new batch, ask yourself:
-"Would I put this next to 'FRY EM' COWBOY' and feel good about it?"
+For each headline, ask: "Does this belong next to 'FRY EM' COWBOY' and 'MADE IT FROM SCRATCH MOSTLY'?"
 
-If YES → PASS
-If CLOSE but needs a sharper word or a better beat → REWRITE it (keep the idea, punch up the execution)
-If NO, it's flat/generic/meaningless → CUT it and replace with something that HAS attitude
+PASS → Yes, it has the energy. Ship it.
+REWRITE → The idea is there but the words need work. Make it shorter, sharper, more specific.
+CUT → It's flat, generic, or trying too hard. Replace with something that has real personality. Your replacement should be 2–5 words and feel like something a person would actually say.
 
-Things that should get CUT immediately:
-- Anything vague or empty ("COUNTS AS COOKING", "REAL MEAL", "DINNER MADE ITSELF")
-- Anything that could be for literally any brand
-- Anything that sounds like a strategy brief restated as a headline
-- Anything where you can't picture a specific person or moment
-- Forced concept mashups that don't naturally go together
-
-When you REWRITE or replace a CUT, channel the same energy as the approved headlines — attitude, specificity, a turn of phrase that surprises.`;
+CUT immediately if:
+- It's vague ("COOK SMART", "REAL FOOD", "KITCHEN VIBES")
+- It could be for any brand
+- It sounds like a brand brief, not a headline
+- It combines concepts that don't naturally go together
+- You wouldn't text it to a friend`;
 
 // ─── Phase 3: Assign images ───
 
@@ -193,7 +202,7 @@ export async function generateCopy(
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
   // ── PHASE 1: Write headlines ──
-  const overgenerate = numVersions + 4; // a few extra so the CD can cut
+  const overgenerate = numVersions + 4;
 
   const writeResponse = await client.messages.create({
     model: "claude-sonnet-4-6",
@@ -204,12 +213,12 @@ export async function generateCopy(
         role: "user",
         content: `Write ${overgenerate} original headlines for Hamilton Beach "Yes You Can Chef" social static ads on ${channel}.
 
-Mix it up:
-- Some that twist a familiar phrase or saying
-- Some that are quietly funny or self-aware
-- Some that are confident and warm
-- Some that are just 2 lines — short and punchy (Line3a = "")
-- All should have specific, concrete language — not vague vibes
+Mix across the patterns:
+- A few wordplay/puns
+- A few self-aware / honest humor
+- A few specific life moments
+- A few short confident ones (2–3 words)
+- At least a third should be 2-liners (Line3a = "")
 
 Return ONLY a JSON array:
 [
@@ -262,7 +271,7 @@ Return ONLY a JSON array:
   }
 ]
 
-${rawHeadlines.length} objects. Be tough but creative — if you cut something, the replacement should have real attitude.`,
+${rawHeadlines.length} objects. Be tough but creative — replacements should have real personality.`,
       },
     ],
   });
@@ -273,7 +282,7 @@ ${rawHeadlines.length} objects. Be tough but creative — if you cut something, 
       : "";
   const checkedHeadlines = extractJSON<CheckedHeadline[]>(checkText);
 
-  // Prioritize PASSes, then REWRITEs, then CUTs — take what we need
+  // Prioritize PASSes, then REWRITEs, then CUTs
   const prioritized = [...checkedHeadlines].sort((a, b) => {
     const order = { PASS: 3, REWRITE: 2, CUT: 1 };
     return (order[b.status] || 0) - (order[a.status] || 0);
