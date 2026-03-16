@@ -352,42 +352,6 @@ export default function CopywriterPage() {
             )}
           </div>
 
-          {/* Image asset reference */}
-          <h2 style={{ ...styles.sectionLabel, marginTop: 24 }}>
-            IMAGE LIBRARY
-          </h2>
-          <div style={styles.imageGrid}>
-            {[
-              {
-                file: "david_coffee.jpg",
-                label: "David — Coffee",
-                sub: "Modern Kitchen · Weekend at Home",
-              },
-              {
-                file: "mia_toaster.jpg",
-                label: "Mia — Toaster",
-                sub: "Bright Kitchen · Leaving for Work",
-              },
-              {
-                file: "marcus_blender.jpg",
-                label: "Marcus — Blender",
-                sub: "Ecclectic Kitchen · Before a Workout",
-              },
-              {
-                file: "ladies_airfryer.jpg",
-                label: "Martha — Airfryer",
-                sub: "Cozy Kitchen · Weekend at Home",
-              },
-            ].map((img) => (
-              <div key={img.file} style={styles.imageCard}>
-                <div style={styles.imagePlaceholder}>
-                  <span style={styles.imageIcon}>&#128247;</span>
-                </div>
-                <p style={styles.imageLabel}>{img.label}</p>
-                <p style={styles.imageSub}>{img.sub}</p>
-              </div>
-            ))}
-          </div>
         </main>
       </div>
 
@@ -737,46 +701,6 @@ const styles: Record<string, React.CSSProperties> = {
   flowArrow: {
     fontSize: 14,
     color: C.textSecondary,
-  },
-
-  // IMAGE LIBRARY
-  imageGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr 1fr",
-    gap: 12,
-  },
-  imageCard: {
-    background: C.cardBg,
-    border: `1px solid ${C.cardBorder}`,
-    borderRadius: 6,
-    padding: 14,
-    textAlign: "center" as const,
-  },
-  imagePlaceholder: {
-    width: "100%",
-    height: 80,
-    background: C.bg,
-    borderRadius: 4,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 10,
-  },
-  imageIcon: {
-    fontSize: 24,
-    opacity: 0.3,
-  },
-  imageLabel: {
-    fontSize: 12,
-    fontWeight: 600,
-    color: C.textPrimary,
-    margin: "0 0 2px 0",
-  },
-  imageSub: {
-    fontSize: 10,
-    color: C.textSecondary,
-    margin: 0,
-    lineHeight: 1.4,
   },
 
   // TABLE (preview)

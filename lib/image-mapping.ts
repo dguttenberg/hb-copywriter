@@ -8,32 +8,88 @@ export interface ImageAsset {
 
 export const IMAGE_ASSETS: ImageAsset[] = [
   {
-    file_name: "david_coffee.jpg",
-    model: "David",
-    product: "Coffee",
-    kitchen: "Modern Kitchen",
-    clothing: "Weekend at Home",
+    file_name: "Airfryer_Classic_AfterWork_Zillennial_Emma",
+    model: "Emma",
+    product: "Air Fryer",
+    kitchen: "Classic Kitchen",
+    clothing: "After Work",
   },
   {
-    file_name: "mia_toaster.jpg",
+    file_name: "AirFryer_ModernKitchen_AfterWork_Alex_Zillennial",
+    model: "Alex",
+    product: "Air Fryer",
+    kitchen: "Ecclectic Kitchen",
+    clothing: "After Work",
+  },
+  {
+    file_name: "Blender_PreWorkout_EcclecticKitchen_Mia_Zillennial",
+    model: "Mia",
+    product: "Blender",
+    kitchen: "Simple Kitchen",
+    clothing: "Pre Workout",
+  },
+  {
+    file_name: "Blender_WeekendCasual_SimpleKitcheN_Alex_Zillennial",
+    model: "Alex",
+    product: "Blender",
+    kitchen: "Simple Kitchen",
+    clothing: "Before Work",
+  },
+  {
+    file_name: "CofeeMaker_SimpleKitchen_BeforeWork_Marcus_Zillennial",
+    model: "Marcus",
+    product: "Coffee Maker",
+    kitchen: "Cozy Kitchen",
+    clothing: "Before Work",
+  },
+  {
+    file_name: "CoffeeMaker_BeforeWork_CozyKitchen_Emma_Zillenial",
+    model: "Emma",
+    product: "Coffee Maker",
+    kitchen: "Ecclectic Kitchen",
+    clothing: "Before Work",
+  },
+  {
+    file_name: "CoffeeMaker_EcclecticKitchen_PreWorkout_Taylor_GenX",
+    model: "Taylor",
+    product: "Coffee Maker",
+    kitchen: "Modern Kitchen",
+    clothing: "Pre Workout",
+  },
+  {
+    file_name: "PersonalBlender_ModernKitchen_BeforeWork_Taylor_GenX",
+    model: "Taylor",
+    product: "Personal Blender",
+    kitchen: "Modern Kitchen",
+    clothing: "Before Work",
+  },
+  {
+    file_name: "PersonalBlender_ModernKitchen_PreWorkout_Marcus_Zillennial",
+    model: "Marcus",
+    product: "Personal Blender",
+    kitchen: "Retro Kitchen",
+    clothing: "Pre Workout",
+  },
+  {
+    file_name: "PersonalBlender_RetroKitchen_WeekendCasual_Marcus_Zillennial",
+    model: "Marcus",
+    product: "Personal Blender",
+    kitchen: "Bright Kitchen",
+    clothing: "Weekend Casual",
+  },
+  {
+    file_name: "Toaster_BrightKitchen_WeekendCasual_Mia_Zillennial",
     model: "Mia",
     product: "Toaster",
     kitchen: "Bright Kitchen",
-    clothing: "Leaving for Work",
+    clothing: "Weekend Casual",
   },
   {
-    file_name: "marcus_blender.jpg",
-    model: "Marcus",
-    product: "Blender",
-    kitchen: "Ecclectic Kitchen",
-    clothing: "Before a Workout",
-  },
-  {
-    file_name: "ladies_airfryer.jpg",
-    model: "Martha",
-    product: "Airfryer",
+    file_name: "Toaster_CozyKitchen_PreWork_David_GenX",
+    model: "David",
+    product: "Toaster",
     kitchen: "Cozy Kitchen",
-    clothing: "Weekend at Home",
+    clothing: "Before Work",
   },
 ];
 
@@ -41,31 +97,33 @@ export function selectImage(
   productMatch: string,
   clothingContext: string
 ): string {
+  const normalize = (s: string) => s.toLowerCase().trim();
+
   // Primary: match on product
   const productMatches = IMAGE_ASSETS.filter(
-    (img) => img.product.toLowerCase() === productMatch.toLowerCase()
+    (img) => normalize(img.product) === normalize(productMatch)
   );
+
   if (productMatches.length === 1) return productMatches[0].file_name;
 
   // If multiple product matches, use clothing as tiebreaker
   if (productMatches.length > 1) {
     const exact = productMatches.find(
-      (img) => img.clothing.toLowerCase() === clothingContext.toLowerCase()
+      (img) => normalize(img.clothing) === normalize(clothingContext)
     );
     if (exact) return exact.file_name;
-    return productMatches[0].file_name;
+    // Random pick among product matches for variety
+    const idx = Math.floor(Math.random() * productMatches.length);
+    return productMatches[idx].file_name;
   }
 
   // Fallback: try clothing match
   const clothingMatch = IMAGE_ASSETS.find(
-    (img) => img.clothing.toLowerCase() === clothingContext.toLowerCase()
+    (img) => normalize(img.clothing) === normalize(clothingContext)
   );
   if (clothingMatch) return clothingMatch.file_name;
 
-  // Final fallback: rotate based on hash of product string
-  const idx =
-    Math.abs(
-      productMatch.split("").reduce((a, c) => a + c.charCodeAt(0), 0)
-    ) % IMAGE_ASSETS.length;
+  // Final fallback: random
+  const idx = Math.floor(Math.random() * IMAGE_ASSETS.length);
   return IMAGE_ASSETS[idx].file_name;
 }
