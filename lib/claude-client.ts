@@ -113,12 +113,27 @@ function buildImageAssignmentPrompt(): string {
       `• ${img.product} (${img.file_name}): ${img.model} in a ${img.kitchen}, dressed ${img.clothing}`
   ).join("\n");
 
-  return `You are pairing headlines with photography for Hamilton Beach social ads.
+  return `You are pairing headlines with photography for Hamilton Beach social ads. Each photo shows a person using a specific appliance.
 
 Available photos:
 ${imageDescriptions}
 
-Match based on vibe and moment, not literal product references. Spread photos evenly across the batch. When in doubt, go with what looks best as an ad.`;
+MATCHING RULES:
+1. The headline text should NOT CONTRADICT what's visible in the photo. This is the most important rule.
+   - If the headline mentions blending, smoothies, or mixing → use a Blender or Personal Blender photo
+   - If the headline mentions frying, crispy, or air frying → use an Air Fryer photo
+   - If the headline mentions toast, toasting, or breakfast bread → use a Toaster photo
+   - If the headline mentions coffee, espresso, or morning brew → use a Coffee Maker photo
+   - If the headline mentions chopping, seasoning, or cooking generally → Air Fryer or Toaster work (NOT a blender)
+
+2. If the headline is GENERIC (no specific food action — like "NOT BAD FOR A TUESDAY" or "ADULTHOOD SMELLS LIKE GARLIC"), any product works. Pick based on vibe:
+   - Cozy/evening vibes → After Work or Weekend Casual clothing shots
+   - Morning/energy vibes → Before Work or Pre Workout shots
+   - Social/hosting vibes → any that feel warm and inviting
+
+3. Spread photos evenly across the batch — no more than 3 headlines on the same product category.
+
+4. When in doubt, pick the photo that would LOOK best as an ad with that headline over it.`;
 }
 
 // ─── JSON extraction ───
