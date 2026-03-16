@@ -31,41 +31,28 @@ HEADLINES THE CREATIVE TEAM LOVED
 These are organized by WHY they work. Study the patterns, then write new ones.
 
 WORDPLAY & PUNS — a familiar word or phrase gets a cooking twist:
-- "SOUP-ER" / "EASY"
-- "MAKE IT LOOK" / "OVER EASY" → "over easy" = eggs + effortless
 - "WHISK IT" / "FOR THE" / "BISCUIT"
-- "READY SET" / "BLEND"
-- "YOUR GO-TO'S" / "GO-TOS"
 - "FRY FIRST," / "ASK QUESTIONS" / "LATER"
+- "MAKE IT" / "LOOK" / "OVER EASY"
+- "IT WASN'T" / "COMPLICATED" / "IT JUST LOOKED LIKE IT"
 
 SELF-AWARE HUMOR — admitting imperfection with a wink:
 - "MADE IT" / "FROM SCRATCH" / "MOSTLY"
 - "FIRST TIME" / "HOSTING." / "YOU SURVIVED"
-- "IMPERFECT" / "STILL COUNTS"
-- "MESSY, BUT" / "STILL DELICIOUS"
-- "IT WASN'T" / "COMPLICATED" / "IT JUST LOOKED LIKE IT"
-- "NOT BAD" / "FOR A TUESDAY"
+- "NOT BAD" / "FOR A" / "TUESDAY"
+- "MESSY" / "BUT STILL" / "DELICIOUS"
 
 SPECIFIC LIFE MOMENTS — you can picture the exact scene:
-- "NEW APARTMENT" / "FIRST MEAL"
 - "ADULTHOOD" / "SMELLS LIKE" / "GARLIC"
 - "YOU WERE" / "AT WORK." / "IT COOKED"
 - "YOUR FRIEND'S" / "FAVORITE" / "HAPPY HOUR"
-- "BE YOUR FRIENDS'" / "FAVORITE BARTENDER"
-- "GLUTEN FREE" / "HAPPY BIRTHDAY"
+- "YOU HAVE" / "A SIGNATURE" / "DISH NOW"
 
-CONFIDENT & SHORT — swagger in 2–3 words:
-- "FRY EM'" / "COWBOY"
-- "MEAL PREP" / "MVP"
-- "IMPRESS" / "YOURSELF"
+CONFIDENT — swagger, no filler:
 - "SMOOTHIE" / "GAME:" / "UNDEFEATED"
 - "BLEND IT" / "LIKE YOU" / "MEAN IT"
-
-ASPIRATIONAL BUT ACCESSIBLE — you pulled off something real:
-- "YOU DID" / "WELLINGTON"
-- "YOU HAVE" / "A SIGNATURE" / "DISH NOW"
-- "GLUTEN FREE PIZZA" / "FROM SCRATCH"
 - "THE PERFECT" / "GOLDEN" / "BROWN"
+- "MAKE FRIES" / "WORTH" / "FIGHTING OVER"
 
 THE PATTERNS:
 1. Most are 2–5 words total. Short hits hardest.
@@ -77,10 +64,11 @@ THE PATTERNS:
 DO NOT REUSE ANY OF THESE. Write completely original headlines using these same patterns.
 
 FORMAT:
-- 2–3 lines (Line1a, Line2a, Line3a). Line3a can be empty.
-- ALL CAPS. 2–5 words per line. 3–8 words total.
-- Last line carries the weight.
-- Rare punctuation. No periods except for dramatic effect. Contractions welcome.`;
+- ALWAYS 3 lines (Line1a, Line2a, Line3a). Every headline MUST have all 3 lines filled.
+- ALL CAPS. 1–4 words per line. 3–8 words total.
+- Last line carries the weight — that's the beat that lands.
+- Rare punctuation. No periods except for dramatic effect. Contractions welcome.
+- For short headlines, split across 3 lines: "BLEND IT" / "LIKE YOU" / "MEAN IT" not "BLEND IT LIKE YOU" / "MEAN IT".`;
 }
 
 // ─── Phase 2: Creative Director QC ───
@@ -217,15 +205,15 @@ Mix across the patterns:
 - A few wordplay/puns
 - A few self-aware / honest humor
 - A few specific life moments
-- A few short confident ones (2–3 words)
-- At least a third should be 2-liners (Line3a = "")
+- A few short confident ones
+- EVERY headline MUST have all 3 lines filled (Line1a, Line2a, Line3a). No empty lines. Split short headlines across 3 lines.
 
 Return ONLY a JSON array:
 [
   {
     "Line1a": "FIRST LINE",
     "Line2a": "SECOND LINE",
-    "Line3a": "THIRD LINE OR EMPTY STRING"
+    "Line3a": "THIRD LINE (required, never empty)"
   }
 ]
 
@@ -266,7 +254,7 @@ Return ONLY a JSON array:
   {
     "Line1a": "LINE",
     "Line2a": "LINE",
-    "Line3a": "LINE OR EMPTY",
+    "Line3a": "LINE (required, never empty)",
     "status": "PASS|REWRITE|CUT"
   }
 ]

@@ -154,7 +154,7 @@ export async function buildExcelFile(rows: CopyRow[]): Promise<Buffer> {
       [5, FIXED_VALUES.language],
       [6, row.Line1a],
       [7, row.Line2a],
-      [8, row.Line3a],
+      [8, row.Line3a || " "],  // Never leave blank — CreateTotally fills blanks with template defaults
       [9, FIXED_VALUES.logo_lockup],
       [10, colorBlock],
       [11, photo],
