@@ -1,4 +1,6 @@
-import { ContextPackage, NucleusResponse } from "./types";
+import { NucleusResponse } from "./types";
+
+const MAX_RETRIES = 3;
 
 export async function callNucleus(
   objective: string,
@@ -21,18 +23,37 @@ export async function callNucleus(
     sku: "Hamilton Beach",
   };
 
-  const res = await fetch(`${nucleusUrl}/api/nucleus`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  let lastError = "";
 
-  if (!res.ok) {
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    const res = await fetch(`${nucleusUrl}/api/nucleus`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (res.ok) {
+      return res.json();
+    }
+
+    // Parse the error
     const err = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(
-      `Nucleus API error: ${err.detail || err.error || res.statusText}`
-    );
+    lastError = err.detail || err.error || res.statusText;
+
+    // Retry on JSON parse failures (LLM flakiness) — not on 400s
+    const isParseError =
+      lastError.includes("JSON parse failed") ||
+      lastError.includes("No valid JSON");
+
+    if (isParseError && attempt < MAX_RETRIES) {
+      console.log(
+        `Nucleus JSON parse failed (attempt ${attempt}/${MAX_RETRIES}), retrying...`
+      );
+      continue;
+    }
+
+    break;
   }
 
-  return res.json();
+  throw new Error(`Nucleus API error: ${lastError}`);
 }
