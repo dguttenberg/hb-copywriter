@@ -2,15 +2,13 @@ import Anthropic from "@anthropic-ai/sdk";
 import { ContextPackage, CopyRow } from "./types";
 import { IMAGE_ASSETS } from "./image-mapping";
 
-// ─── Phase 1: Write headlines freely (NO product thinking) ───
+// ─── Phase 1: Write headlines with personality ───
 
 function buildWritingPrompt(ctx: ContextPackage): string {
-  return `You are a senior creative copywriter at an ad agency. You write headline copy for Hamilton Beach's "Yes You Can Chef" social campaign. Your output will be stamped into bold, variable-width stacked typography on 9x16 social static ads — meaning a PHONE SCREEN, in GIANT TYPE, over a photo.
-
-YOU ARE NOT A STRATEGIST. You are a WRITER. The strategic context below is your brief — absorb it, then FORGET the language it uses. Your job is to write headlines that a 27-year-old scrolling Instagram would stop for. Not headlines that sound like a creative brief read aloud.
+  return `You are a senior creative copywriter at an ad agency. You write headline copy for Hamilton Beach's "Yes You Can Chef" social campaign — bold, stacked text on 9x16 social static ads over photos of real people in real kitchens.
 
 ═══════════════════════════════════════════
-BRIEF (absorb this, then write AWAY from it)
+YOUR BRIEF
 ═══════════════════════════════════════════
 
 Objective: ${ctx.objective}
@@ -31,95 +29,86 @@ ${ctx.voice_calibration}
 
 Use cases to draw from: ${ctx.content_inputs.use_cases.join("; ")}
 
-Things to never do:
+Never do:
 ${ctx.do_not.map((d) => `- ${d}`).join("\n")}
 
 ═══════════════════════════════════════════
-CREATIVE EXECUTION RULES (this is what matters)
+THE WORK
 ═══════════════════════════════════════════
 
-Each headline is 2–3 lines of bold stacked text (Line1a, Line2a, Line3a). These will be rendered in HUGE BOLD TYPE on a phone screen. Less is more. The fewer the words, the bigger each word prints, the harder it hits.
+Here are the APPROVED headlines for this campaign. This is the quality bar. Study the ATTITUDE, the WORDPLAY, and the VOICE — then write NEW headlines at this level:
 
-THE RHYTHM:
-- Line1a is the setup (short, pulls you in)
-- Line2a is the turn or the payoff
-- Line3a is optional — the kicker, or leave empty for a tight 2-liner
-- The WEIGHT lands on the last line. That's the word that sticks.
+- "YOUR GO-TO'S" / "GO-TOS" → simple meal, featuring the appliance
+- "YOU DID" / "WELLINGTON" → beef wellington image, aspirational but accessible
+- "MAKE IT LOOK" / "OVER EASY" → wordplay (over easy eggs + effortless), big breakfast image
+- "SO GOOD YOUR HAIR" / "MIGHT TURN BLUE" → unexpected, specialty latte image
+- "FRY EM'" / "COWBOY" → two words, pure attitude, air fryer
+- "IMPRESS" / "YOURSELF" → simple, warm, panini press
+- "MEAL PREP" / "MVP" → three words, confident, familiar abbreviation
+- "SOUP-ER" / "EASY" → pun, playful, dead simple
+- "READY SET" / "BLEND" → familiar phrase, recontextualized
+- "YOUR FRIEND'S" / "FAVORITE" / "HAPPY HOUR" → specific, social occasion
+- "BE YOUR FRIENDS'" / "FAVORITE BARTENDER" → social, specific role
+- "GLUTEN FREE PIZZA" / "FROM SCRATCH" → specific food moment, achievement
+- "GLUTEN FREE" / "HAPPY BIRTHDAY" → specific, emotional, celebratory
+- "YOUR PERSONAL" / "SOUS CHEF" → clever role metaphor
+- "MAKE IT BETTER" / "AT HOME" → simple, confident
+- "DINNER FOR THE WEEK" / "WITH ONE BUTTON" → specific benefit, effortless
 
-THE VISUAL TEST — imagine your headline rendered at maximum size on a 9x16 phone screen:
-- 2–3 words per line = HUGE type, punchy, dominant. This is the sweet spot.
-- 4 words per line = still good, fills the space well.
-- 5+ words per line = type shrinks, gets cramped, loses impact. Avoid.
-- The best ads in this format have 3–6 TOTAL words. Think billboard, not sentence.
+WHAT MAKES THESE WORK:
+- They're SHORT. Most are 2–4 words. "FRY EM' COWBOY" is two words and it's the best one.
+- They use WORDPLAY and PUNS. "Over easy," "soup-er," "go-to's go-tos" — playful, not trying too hard.
+- They reference SPECIFIC MOMENTS. "Happy birthday," "happy hour," "favorite bartender" — you can picture the exact scene.
+- They're CONFIDENT without being loud. "Impress yourself," "MVP," "you did wellington."
+- Some are ASPIRATIONAL but ACCESSIBLE. "You did wellington" says "you pulled off something fancy" without being intimidating.
+- They never explain the product. The appliance is in the IMAGE, not the words.
 
-WHAT THE ENERGY SHOULD FEEL LIKE:
-These examples show the ENERGY and BREVITY to aim for. Do NOT reuse these — write your own:
-- Two words that reframe an everyday moment → attitude, done
-- A familiar phrase twisted into something new → recognition + surprise
-- A specific food moment everyone knows → instant relatability
-- A playful contradiction → makes you smile, makes you think
-- Quiet confidence about something simple → warmth without trying
+DO NOT REUSE ANY OF THESE HEADLINES. Write completely original ones with the same energy.
 
-WHAT TO AVOID:
-- Anything that sounds like a therapist, a motivational poster, or a brand deck
-- Restating the brief in headline form ("BUILT FOR REAL KITCHENS")
-- Product claims pretending to be creative ("AFFORDABLE AND RELIABLE")
-- Cramming a whole thought into three dense lines — if it needs that many words, the idea isn't sharp enough
-- Combining two unrelated concepts to seem clever (e.g., mixing gym/workout language with cooking — these worlds don't naturally overlap and it reads as forced)
-- Lines that only work if you already know the brand strategy
-
-THE KEY INSIGHT: The best headlines in this format are SHORT. A 2-word line printed at 80pt hits harder than a 6-word line printed at 30pt. When in doubt, cut words. If the idea needs 8+ words, find a sharper version of the idea.
-
-PRACTICAL RULES:
+FORMAT:
+- Each headline is 2–3 lines (Line1a, Line2a, Line3a)
+- Line3a can be empty for a punchy 2-liner
 - ALL CAPS always
-- 2–4 words per line ideal, 5 max, 6 absolute ceiling
-- Total headline: 3–7 words is the sweet spot. Never exceed 10.
-- At least half the batch should be 5 words or fewer total
-- Never end a line with "THE" or "A" — those go at the start of the next line
-- Punctuation is rare. No periods. Occasional comma or apostrophe only.
-- Contractions are good (DON'T, ISN'T, WON'T)
-
-IMPORTANT: Do NOT think about specific products or appliances when writing. Write about the MOMENTS, FEELINGS, and OCCASIONS of cooking and eating. The imagery will be paired separately — your only job is the words.`;
+- 2–5 words per line
+- Total: 4–8 words per headline
+- The last line carries the weight — that's where the beat drops
+- No periods. Rare punctuation. Contractions welcome.`;
 }
 
-// ─── Phase 2: Creative Director review ───
+// ─── Phase 2: Creative Director QC ───
 
-const CD_REVIEW_SYSTEM = `You are a creative director at a top agency. You're reviewing headline copy for Hamilton Beach 9x16 social static ads — bold stacked text over a photo on a phone screen.
+const CD_REVIEW_SYSTEM = `You are creative directing Hamilton Beach "Yes You Can Chef" social ads. You're reviewing a batch of headlines against the approved quality bar.
 
-You've been doing this for 15 years. You have strong opinions. You know what works in this format and you're not afraid to kill a headline.
+THE QUALITY BAR — these headlines got approved by the creative team:
+- "FRY EM' COWBOY"
+- "MAKE IT LOOK OVER EASY"
+- "SOUP-ER EASY"
+- "READY SET BLEND"
+- "YOUR FRIEND'S FAVORITE HAPPY HOUR"
+- "MEAL PREP MVP"
+- "GLUTEN FREE HAPPY BIRTHDAY"
+- "YOU DID WELLINGTON"
+- "IMPRESS YOURSELF"
 
-YOUR REVIEW PROCESS — for each headline, run these checks:
+What makes those work: WORDPLAY + BREVITY + SPECIFIC MOMENTS. They're playful. They're short. They sound like a person being clever, not a brand trying to be clever. Most are 2–4 words.
 
-1. THE SCROLL TEST: Would someone scrolling Instagram at 11pm actually stop for this? Not "would they understand it" — would they STOP? If it's just fine, it fails. Fine doesn't stop a scroll.
+For each headline in the new batch, ask yourself:
+"Would I put this next to 'FRY EM' COWBOY' and feel good about it?"
 
-2. THE READ-ALOUD TEST: Say it out loud. Does it flow naturally, or do you stumble? Headlines that trip on their own rhythm are dead. Watch for:
-   - Awkward word combos that sound unnatural spoken aloud
-   - Concepts that don't belong in the same sentence (gym + coffee, punishment + cooking)
-   - Lines that only make sense if you squint and fill in the gaps
+If YES → PASS
+If CLOSE but needs a sharper word or a better beat → REWRITE it (keep the idea, punch up the execution)
+If NO, it's flat/generic/meaningless → CUT it and replace with something that HAS attitude
 
-3. THE VISUAL TEST: This goes on a phone in giant bold type. Close your eyes and see it:
-   - If total words > 7, the type shrinks and it looks like a paragraph, not a headline. REWRITE shorter.
-   - If any single line is 5+ words, it'll be tiny. REWRITE tighter.
-   - Does it have visual rhythm? A 2-word line next to a 4-word line creates interesting contrast. Three 4-word lines is monotonous.
+Things that should get CUT immediately:
+- Anything vague or empty ("COUNTS AS COOKING", "REAL MEAL", "DINNER MADE ITSELF")
+- Anything that could be for literally any brand
+- Anything that sounds like a strategy brief restated as a headline
+- Anything where you can't picture a specific person or moment
+- Forced concept mashups that don't naturally go together
 
-4. THE ORIGINALITY TEST: Have you seen this exact construction before? Does it feel like it was generated from a template? Common clichés to kill:
-   - "[noun] THAT DOESN'T TASTE LIKE [place]" — overused construction
-   - "[verb] IT, [result]" — feels formulaic after the second one
-   - "NOT GONNA [modest claim] BUT [humble payoff]" — one per batch max, it's a good device but repeatable
-   - Anything with "THE GYM" in a cooking ad — these worlds don't mix
+When you REWRITE or replace a CUT, channel the same energy as the approved headlines — attitude, specificity, a turn of phrase that surprises.`;
 
-5. THE BRAND FIT TEST: Does this feel like it could be a Hamilton Beach ad, or could it be for literally anything? It should feel rooted in cooking/kitchen culture without being generic about it.
-
-SCORING:
-- PASS: Genuinely strong. You'd present this to the client.
-- REWRITE: The idea has something but the execution isn't there. Fix it — make it shorter, sharper, more specific. Your rewrite should be 3–6 words total if possible.
-- CUT: It's beyond saving. Replace with something completely new and short — 3–5 words, punchy, different energy than what's already in the batch.
-
-IMPORTANT: You should REWRITE or CUT at least 20-30% of the batch. If you're passing everything, you're not being critical enough. Be the CD who makes the work better, not the one who rubber-stamps everything.
-
-When you REWRITE or CUT, your replacements should be SHORTER than the original. Brevity is the whole game in this format.`;
-
-// ─── Phase 3: Assign images based on copy vibe ───
+// ─── Phase 3: Assign images ───
 
 function buildImageAssignmentPrompt(): string {
   const imageDescriptions = IMAGE_ASSETS.map(
@@ -127,22 +116,15 @@ function buildImageAssignmentPrompt(): string {
       `• ${img.product} (${img.file_name}): ${img.model} in a ${img.kitchen}, dressed ${img.clothing}`
   ).join("\n");
 
-  return `You are a creative director pairing headlines with photography for social ads. Given a batch of headlines, assign each one to the most natural-feeling photo.
+  return `You are pairing headlines with photography for Hamilton Beach social ads.
 
 Available photos:
 ${imageDescriptions}
 
-RULES:
-- Match based on the VIBE and MOMENT the headline evokes, not literal product mentions
-- A headline about morning energy could pair with Coffee OR Blender — pick what feels most natural
-- A headline about hosting friends could pair with Airfryer (group cooking) or any product really
-- Don't overthink it — if the headline is about a cozy moment, the "Weekend at Home" shots work
-- If the headline has an energetic/active vibe, "Before a Workout" or "Leaving for Work" shots work
-- Spread the photos across the batch — don't put all headlines on one image
-- When in doubt, go with what LOOKS best as an ad, not what's most "correct"`;
+Match based on vibe and moment, not literal product references. Spread photos evenly across the batch. When in doubt, go with what looks best as an ad.`;
 }
 
-// ─── JSON extraction (shared) ───
+// ─── JSON extraction ───
 
 function extractJSON<T>(text: string): T {
   let jsonStr = text;
@@ -180,7 +162,7 @@ function extractJSON<T>(text: string): T {
   }
 }
 
-// ─── Main pipeline ───
+// ─── Types ───
 
 interface RawHeadline {
   Line1a: string;
@@ -201,6 +183,8 @@ interface ImageAssignment {
   clothing_context: string;
 }
 
+// ─── Main pipeline ───
+
 export async function generateCopy(
   contextPackage: ContextPackage,
   numVersions: number,
@@ -208,26 +192,24 @@ export async function generateCopy(
 ): Promise<CopyRow[]> {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-  // ── PHASE 1: Write headlines freely ──
-  const writingPrompt = buildWritingPrompt(contextPackage);
-
-  // Ask for extra headlines so the CD has room to cut
-  const overgenerate = Math.ceil(numVersions * 1.4);
+  // ── PHASE 1: Write headlines ──
+  const overgenerate = numVersions + 4; // a few extra so the CD can cut
 
   const writeResponse = await client.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 4000,
-    system: writingPrompt,
+    system: buildWritingPrompt(contextPackage),
     messages: [
       {
         role: "user",
-        content: `Write ${overgenerate} headlines for Hamilton Beach "Yes You Can Chef" social static ads on ${channel}.
+        content: `Write ${overgenerate} original headlines for Hamilton Beach "Yes You Can Chef" social static ads on ${channel}.
 
-VARIETY — across the batch:
-- Mix entry points: some lead with the food, some with the moment, some with the person, some with attitude
-- Mix register: some warm, some playful, some quietly funny, some confident
-- At least a third should be tight 2-liners (Line3a = "")
-- Aim for 3–6 total words per headline. A few can go to 7–8 if the idea demands it, but those are the exception.
+Mix it up:
+- Some that twist a familiar phrase or saying
+- Some that are quietly funny or self-aware
+- Some that are confident and warm
+- Some that are just 2 lines — short and punchy (Line3a = "")
+- All should have specific, concrete language — not vague vibes
 
 Return ONLY a JSON array:
 [
@@ -238,7 +220,7 @@ Return ONLY a JSON array:
   }
 ]
 
-Exactly ${overgenerate} objects. No commentary. No product names. Just the headline text.`,
+${overgenerate} objects. No commentary.`,
       },
     ],
   });
@@ -249,12 +231,12 @@ Exactly ${overgenerate} objects. No commentary. No product names. Just the headl
       : "";
   const rawHeadlines = extractJSON<RawHeadline[]>(writeText);
 
-  // ── PHASE 2: Creative Director review ──
+  // ── PHASE 2: CD Review ──
   const headlineList = rawHeadlines
-    .map((h, i) => {
-      const words = `${h.Line1a} ${h.Line2a} ${h.Line3a}`.trim().split(/\s+/).length;
-      return `${i + 1}. "${h.Line1a}" / "${h.Line2a}"${h.Line3a ? ` / "${h.Line3a}"` : ""} [${words} words]`;
-    })
+    .map(
+      (h, i) =>
+        `${i + 1}. "${h.Line1a}" / "${h.Line2a}"${h.Line3a ? ` / "${h.Line3a}"` : ""}`
+    )
     .join("\n");
 
   const checkResponse = await client.messages.create({
@@ -264,25 +246,23 @@ Exactly ${overgenerate} objects. No commentary. No product names. Just the headl
     messages: [
       {
         role: "user",
-        content: `Review these ${rawHeadlines.length} headlines for Hamilton Beach "Yes You Can Chef" social ads. I need exactly ${numVersions} strong ones for the final batch.
+        content: `Review these headlines. I need ${numVersions} strong ones for the final batch.
 
 ${headlineList}
 
-For each headline: PASS it, REWRITE it (shorter and sharper), or CUT it and replace with something new (3–5 words).
+For each: PASS, REWRITE (sharper), or CUT (replace entirely).
 
 Return ONLY a JSON array:
 [
   {
-    "Line1a": "FIRST LINE",
-    "Line2a": "SECOND LINE",
-    "Line3a": "THIRD LINE OR EMPTY STRING",
+    "Line1a": "LINE",
+    "Line2a": "LINE",
+    "Line3a": "LINE OR EMPTY",
     "status": "PASS|REWRITE|CUT"
   }
 ]
 
-Exactly ${rawHeadlines.length} objects. Preserve the order. Be tough — this work represents the brand.
-
-After the array, do NOT add commentary.`,
+${rawHeadlines.length} objects. Be tough but creative — if you cut something, the replacement should have real attitude.`,
       },
     ],
   });
@@ -293,18 +273,13 @@ After the array, do NOT add commentary.`,
       : "";
   const checkedHeadlines = extractJSON<CheckedHeadline[]>(checkText);
 
-  // Take the best ones — prioritize PASSes, then REWRITEs, then CUTs
-  // Also enforce a hard word count limit
-  const scored = checkedHeadlines.map((h) => {
-    const totalWords = `${h.Line1a} ${h.Line2a} ${h.Line3a}`.trim().split(/\s+/).length;
-    const statusScore = h.status === "PASS" ? 3 : h.status === "REWRITE" ? 2 : 1;
-    const lengthPenalty = totalWords > 7 ? -1 : totalWords <= 5 ? 1 : 0;
-    return { ...h, score: statusScore + lengthPenalty, totalWords };
+  // Prioritize PASSes, then REWRITEs, then CUTs — take what we need
+  const prioritized = [...checkedHeadlines].sort((a, b) => {
+    const order = { PASS: 3, REWRITE: 2, CUT: 1 };
+    return (order[b.status] || 0) - (order[a.status] || 0);
   });
 
-  // Sort by score descending, take what we need
-  scored.sort((a, b) => b.score - a.score);
-  const finalHeadlines: RawHeadline[] = scored
+  const finalHeadlines: RawHeadline[] = prioritized
     .slice(0, numVersions)
     .map((h) => ({
       Line1a: h.Line1a,
@@ -313,7 +288,6 @@ After the array, do NOT add commentary.`,
     }));
 
   // ── PHASE 3: Assign images ──
-  const imagePrompt = buildImageAssignmentPrompt();
   const products = IMAGE_ASSETS.map((img) => img.product).join(", ");
   const clothingOptions = [
     ...new Set(IMAGE_ASSETS.map((img) => img.clothing)),
@@ -329,26 +303,20 @@ After the array, do NOT add commentary.`,
   const imageResponse = await client.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 2000,
-    system: imagePrompt,
+    system: buildImageAssignmentPrompt(),
     messages: [
       {
         role: "user",
-        content: `Assign photos to these ${finalHeadlines.length} headlines:
+        content: `Assign photos to these headlines:
 
 ${finalList}
 
-For each headline, pick the best product photo and clothing context.
-
 Return ONLY a JSON array:
 [
-  {
-    "index": 0,
-    "product_match": "one of: ${products}",
-    "clothing_context": "one of: ${clothingOptions}"
-  }
+  { "index": 0, "product_match": "one of: ${products}", "clothing_context": "one of: ${clothingOptions}" }
 ]
 
-Use 0-based indexing. Exactly ${finalHeadlines.length} objects. Spread across different photos — no more than ${Math.ceil(finalHeadlines.length / IMAGE_ASSETS.length) + 1} headlines per photo.`,
+0-based indexing. ${finalHeadlines.length} objects. Spread evenly across photos.`,
       },
     ],
   });
@@ -359,8 +327,8 @@ Use 0-based indexing. Exactly ${finalHeadlines.length} objects. Spread across di
       : "";
   const imageAssignments = extractJSON<ImageAssignment[]>(imageText);
 
-  // ── Combine into final CopyRows ──
-  const copyRows: CopyRow[] = finalHeadlines.map((headline, i) => {
+  // ── Combine ──
+  return finalHeadlines.map((headline, i) => {
     const assignment = imageAssignments.find((a) => a.index === i);
     return {
       Line1a: headline.Line1a,
@@ -370,6 +338,4 @@ Use 0-based indexing. Exactly ${finalHeadlines.length} objects. Spread across di
       clothing_context: assignment?.clothing_context || "Weekend at Home",
     };
   });
-
-  return copyRows;
 }
