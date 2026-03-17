@@ -3,7 +3,7 @@ import { CopyRow } from "./types";
 import { FIXED_VALUES } from "./constants";
 import { selectImage } from "./image-mapping";
 
-export async function buildExcelFile(rows: CopyRow[]): Promise<Buffer> {
+export async function buildExcelFile(rows: (CopyRow & { photo_override?: string })[]): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet("HB Social Static 9x16");
 
@@ -142,7 +142,7 @@ export async function buildExcelFile(rows: CopyRow[]): Promise<Buffer> {
 
     const colorBlock =
       FIXED_VALUES.color_blocks[idx % FIXED_VALUES.color_blocks.length];
-    const photo = selectImage(row.product_match, row.clothing_context);
+    const photo = row.photo_override || selectImage(row.product_match, row.clothing_context);
 
     const dateVal = new Date(2026, 2, 18); // March 18, 2026
 
