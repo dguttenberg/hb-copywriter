@@ -3,17 +3,22 @@
 import { useState, useEffect, useCallback } from "react";
 
 // ============================================================================
-// PALETTE
+// PALETTE — DonerColle Partners (DCP) brand identity
 // ============================================================================
 
 const C = {
-  bg: "#F7F5F0",
-  green: "#2D6A2D",
-  greenLight: "#E8F5E8",
-  textPrimary: "#1A1A1A",
-  textSecondary: "#555555",
+  bg: "#E6E7E8",                      // Cool Grey — page background
+  midnight: "#000531",                 // Midnight Blue — nav, dark areas, primary text
+  violet: "#545DFF",                   // Aurora Violet — labels, focus, accents
+  green: "#20FE8F",                    // Aurora Green — logo, CTAs, key neon accents
+  greenAlpha: "rgba(32,254,143,0.12)", // Green tint for subtle fills
+  ember: "#FF8371",                    // Sunset Ember — errors, warm accents
+  white: "#FFFFFF",
+  offwhite: "#F4F5F7",                 // Subtle input backgrounds
+  textPrimary: "#000531",              // Midnight on light backgrounds
+  textSecondary: "rgba(0,5,49,0.55)",  // Dimmed midnight
   cardBg: "#FFFFFF",
-  cardBorder: "#DDDDDD",
+  cardBorder: "rgba(84,93,255,0.2)",   // Violet alpha border
 };
 
 const CHANNELS = ["Instagram", "TikTok", "Facebook", "Pinterest", "YouTube"];
@@ -112,8 +117,8 @@ function ImagePicker({
                       onClick={() => { onSelect(img.file_name); onClose(); }}
                       style={{
                         ...pickerStyles.thumb,
-                        border: isSelected ? `2px solid ${C.green}` : `1px solid ${C.cardBorder}`,
-                        background: isSelected ? C.greenLight : C.bg,
+                        border: isSelected ? `2px solid ${C.green}` : `1px solid rgba(84,93,255,0.2)`,
+                        background: isSelected ? C.greenAlpha : "rgba(255,255,255,0.05)",
                       }}
                     >
                       <div style={pickerStyles.thumbIcon}>
@@ -136,37 +141,38 @@ function ImagePicker({
 const pickerStyles: Record<string, React.CSSProperties> = {
   overlay: {
     position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-    background: "rgba(0,0,0,0.4)", display: "flex",
+    background: "rgba(0,5,49,0.7)", display: "flex",
     alignItems: "center", justifyContent: "center", zIndex: 1000,
   },
   modal: {
-    background: C.cardBg, borderRadius: 8, width: 560, maxHeight: "80vh",
+    background: C.midnight, borderRadius: 12, width: 560, maxHeight: "80vh",
     overflow: "hidden", display: "flex", flexDirection: "column",
+    border: `1px solid ${C.cardBorder}`,
   },
   header: {
     display: "flex", justifyContent: "space-between", alignItems: "center",
-    padding: "16px 20px", borderBottom: `1px solid ${C.cardBorder}`,
+    padding: "16px 20px", borderBottom: `1px solid rgba(84,93,255,0.2)`,
   },
-  title: { fontSize: 14, fontWeight: 700, color: C.textPrimary },
+  title: { fontSize: 14, fontWeight: 700, color: C.white, fontFamily: '"DM Sans", sans-serif' },
   closeBtn: {
     background: "none", border: "none", fontSize: 22,
-    color: C.textSecondary, cursor: "pointer", padding: 0, lineHeight: 1,
+    color: "rgba(255,255,255,0.5)", cursor: "pointer", padding: 0, lineHeight: 1,
   },
   body: { padding: "16px 20px", overflowY: "auto" as const },
   groupLabel: {
-    fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
-    color: C.textSecondary, textTransform: "uppercase" as const,
-    margin: "12px 0 8px 0",
+    fontSize: 11, fontWeight: 600, letterSpacing: "0.14em",
+    color: C.violet, textTransform: "uppercase" as const,
+    margin: "12px 0 8px 0", fontFamily: '"DM Sans", sans-serif',
   },
   grid: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 },
   thumb: {
-    padding: 10, borderRadius: 6, cursor: "pointer",
+    padding: 10, borderRadius: 8, cursor: "pointer",
     display: "flex", flexDirection: "column" as const,
     alignItems: "center", gap: 4, transition: "all 0.15s",
   },
   thumbIcon: { fontSize: 24 },
-  thumbModel: { fontSize: 11, fontWeight: 600, color: C.textPrimary },
-  thumbClothing: { fontSize: 10, color: C.textSecondary },
+  thumbModel: { fontSize: 11, fontWeight: 600, color: C.white, fontFamily: '"DM Sans", sans-serif' },
+  thumbClothing: { fontSize: 10, color: "rgba(255,255,255,0.5)", fontFamily: '"DM Sans", sans-serif' },
 };
 
 // ============================================================================
@@ -259,12 +265,13 @@ const cardStyles: Record<string, React.CSSProperties> = {
   card: {
     display: "flex", alignItems: "stretch", gap: 0,
     background: C.cardBg, border: `1px solid ${C.cardBorder}`,
-    borderRadius: 6, overflow: "hidden",
+    borderRadius: 8, overflow: "hidden",
   },
   number: {
     width: 36, display: "flex", alignItems: "center", justifyContent: "center",
-    fontSize: 12, fontWeight: 700, color: C.textSecondary,
+    fontSize: 12, fontWeight: 700, color: C.violet,
     background: C.bg, borderRight: `1px solid ${C.cardBorder}`, flexShrink: 0,
+    fontFamily: '"DM Sans", sans-serif',
   },
   copySection: {
     flex: 1, display: "flex", flexDirection: "column" as const,
@@ -272,7 +279,7 @@ const cardStyles: Record<string, React.CSSProperties> = {
   },
   lineInput: {
     width: "100%", border: "none", background: "transparent",
-    fontSize: 14, fontWeight: 700, fontFamily: "inherit",
+    fontSize: 14, fontWeight: 700, fontFamily: '"DM Sans", "Helvetica Neue", Arial, sans-serif',
     color: C.textPrimary, padding: "3px 0", outline: "none",
     letterSpacing: "0.02em", textTransform: "uppercase" as const,
     boxSizing: "border-box" as const,
@@ -280,12 +287,12 @@ const cardStyles: Record<string, React.CSSProperties> = {
   imageButton: {
     width: 160, display: "flex", flexDirection: "column" as const,
     alignItems: "center", justifyContent: "center", gap: 4,
-    background: C.bg, border: "none", borderLeft: `1px solid ${C.cardBorder}`,
+    background: C.offwhite, border: "none", borderLeft: `1px solid ${C.cardBorder}`,
     cursor: "pointer", padding: "10px 12px", flexShrink: 0,
     transition: "background 0.15s",
   },
   imagePreview: {
-    width: 48, height: 48, borderRadius: 6,
+    width: 48, height: 48, borderRadius: 8,
     background: C.cardBg, border: `1px solid ${C.cardBorder}`,
     display: "flex", alignItems: "center", justifyContent: "center",
   },
@@ -293,9 +300,9 @@ const cardStyles: Record<string, React.CSSProperties> = {
     display: "flex", flexDirection: "column" as const,
     alignItems: "center", gap: 1,
   },
-  imageProduct: { fontSize: 11, fontWeight: 600, color: C.textPrimary },
-  imageDetail: { fontSize: 10, color: C.textSecondary },
-  changeLink: { fontSize: 10, color: C.green, fontWeight: 600, marginTop: 2 },
+  imageProduct: { fontSize: 11, fontWeight: 600, color: C.textPrimary, fontFamily: '"DM Sans", sans-serif' },
+  imageDetail: { fontSize: 10, color: C.textSecondary, fontFamily: '"DM Sans", sans-serif' },
+  changeLink: { fontSize: 10, color: C.green, fontWeight: 700, marginTop: 2, fontFamily: '"DM Sans", sans-serif' },
 };
 
 // ============================================================================
@@ -398,8 +405,15 @@ export default function CopywriterPage() {
       <header style={styles.topBar}>
         <div style={styles.topBarInner}>
           <div style={styles.topBarLeft}>
-            <span style={styles.brandName}>Hamilton Beach</span>
-            <span style={styles.nucleusLabel}>Copywriter</span>
+            <div style={styles.dcpLogo}>
+              <span style={styles.dcpMark}>DCP</span>
+              <span style={styles.dcpWordmark}>Doner<br />Colle<br />Partners.</span>
+            </div>
+            <div style={styles.topBarSep} />
+            <div style={styles.topBarContext}>
+              <span style={styles.brandName}>Hamilton Beach</span>
+              <span style={styles.nucleusLabel}>Copywriter</span>
+            </div>
           </div>
           <div style={styles.lanePill}>
             <span style={styles.pill}>Yes You Can Chef</span>
@@ -594,7 +608,8 @@ export default function CopywriterPage() {
         }
         textarea:focus, input:focus, select:focus {
           outline: none;
-          border-color: ${C.green} !important;
+          border-color: ${C.violet} !important;
+          box-shadow: 0 0 0 2px rgba(84,93,255,0.15);
         }
       `}</style>
     </div>
@@ -607,38 +622,55 @@ export default function CopywriterPage() {
 
 const styles: Record<string, React.CSSProperties> = {
   page: {
-    fontFamily: '-apple-system, "Segoe UI", Arial, Helvetica, sans-serif',
+    fontFamily: '"DM Sans", "Helvetica Neue", Arial, sans-serif',
     background: C.bg, minHeight: "100vh", color: C.textPrimary,
   },
   topBar: {
-    background: C.green, padding: "0 32px", height: 56,
+    background: C.midnight, padding: "0 32px", height: 64,
     display: "flex", alignItems: "center",
+    borderBottom: `1px solid rgba(32,254,143,0.12)`,
   },
   topBarInner: {
     display: "flex", justifyContent: "space-between", alignItems: "center",
     width: "100%", maxWidth: 1400, margin: "0 auto",
   },
-  topBarLeft: { display: "flex", alignItems: "baseline", gap: 12 },
-  brandName: { color: "#fff", fontSize: 18, fontWeight: 700, letterSpacing: "0.02em" },
-  nucleusLabel: { color: "rgba(255,255,255,0.7)", fontSize: 14, fontWeight: 400 },
+  topBarLeft: { display: "flex", alignItems: "center", gap: 0 },
+  dcpLogo: { display: "flex", alignItems: "center", gap: 12 },
+  dcpMark: {
+    fontFamily: '"DM Sans", sans-serif', fontWeight: 700, fontSize: 22,
+    color: C.green, letterSpacing: "-0.03em", lineHeight: 1,
+  },
+  dcpWordmark: {
+    fontFamily: '"DM Sans", sans-serif', fontWeight: 700, fontSize: 9,
+    lineHeight: 1.25, color: C.white, textTransform: "uppercase" as const,
+    letterSpacing: "0.04em", borderLeft: "1px solid rgba(255,255,255,0.2)",
+    paddingLeft: 12,
+  },
+  topBarSep: {
+    width: 1, height: 28, background: "rgba(255,255,255,0.15)", margin: "0 20px",
+  },
+  topBarContext: { display: "flex", alignItems: "baseline", gap: 10 },
+  brandName: { color: "#fff", fontSize: 16, fontWeight: 700, letterSpacing: "0.02em" },
+  nucleusLabel: { color: "rgba(255,255,255,0.5)", fontSize: 13, fontWeight: 400 },
   lanePill: { display: "flex", gap: 8 },
   pill: {
-    fontSize: 12, fontWeight: 600, padding: "6px 14px", borderRadius: 14,
-    background: "rgba(255,255,255,0.2)", color: "#fff", letterSpacing: "0.02em",
+    fontSize: 11, fontWeight: 600, padding: "6px 16px", borderRadius: 40,
+    background: "rgba(84,93,255,0.25)", color: "#fff", letterSpacing: "0.06em",
+    textTransform: "uppercase" as const,
   },
   content: {
     display: "flex", maxWidth: 1400, margin: "0 auto",
-    padding: "24px 32px", gap: 28, minHeight: "calc(100vh - 56px)",
+    padding: "24px 32px", gap: 28, minHeight: "calc(100vh - 64px)",
   },
   leftPanel: { width: "32%", minWidth: 320, flexShrink: 0 },
   mainPanel: { flex: 1, display: "flex", flexDirection: "column" as const, gap: 0 },
   sectionLabel: {
-    fontSize: 11, fontWeight: 700, letterSpacing: "0.12em",
-    color: C.textSecondary, margin: "0 0 14px 0", textTransform: "uppercase" as const,
+    fontSize: 11, fontWeight: 600, letterSpacing: "0.16em",
+    color: C.violet, margin: "0 0 14px 0", textTransform: "uppercase" as const,
   },
   inputCard: {
     background: C.cardBg, border: `1px solid ${C.cardBorder}`,
-    borderRadius: 6, padding: "20px 22px",
+    borderRadius: 12, padding: "20px 22px",
   },
   form: { display: "flex", flexDirection: "column" as const, gap: 16 },
   field: { display: "flex", flexDirection: "column" as const, gap: 6 },
@@ -647,48 +679,55 @@ const styles: Record<string, React.CSSProperties> = {
   labelLight: { fontWeight: 400, color: C.textSecondary },
   textarea: {
     width: "100%", padding: "10px 12px", fontSize: 14, lineHeight: 1.55,
-    fontFamily: "inherit", color: C.textPrimary, background: C.bg,
-    border: `1px solid ${C.cardBorder}`, borderRadius: 4,
+    fontFamily: '"DM Sans", "Helvetica Neue", Arial, sans-serif',
+    color: C.textPrimary, background: C.offwhite,
+    border: `1px solid ${C.cardBorder}`, borderRadius: 6,
     resize: "vertical" as const, boxSizing: "border-box" as const,
   },
   input: {
-    width: "100%", padding: "10px 12px", fontSize: 14, fontFamily: "inherit",
-    color: C.textPrimary, background: C.bg, border: `1px solid ${C.cardBorder}`,
-    borderRadius: 4, boxSizing: "border-box" as const,
+    width: "100%", padding: "10px 12px", fontSize: 14,
+    fontFamily: '"DM Sans", "Helvetica Neue", Arial, sans-serif',
+    color: C.textPrimary, background: C.offwhite, border: `1px solid ${C.cardBorder}`,
+    borderRadius: 6, boxSizing: "border-box" as const,
   },
   select: {
-    width: "100%", padding: "10px 12px", fontSize: 14, fontFamily: "inherit",
-    color: C.textPrimary, background: C.bg, border: `1px solid ${C.cardBorder}`,
-    borderRadius: 4, boxSizing: "border-box" as const, cursor: "pointer",
+    width: "100%", padding: "10px 12px", fontSize: 14,
+    fontFamily: '"DM Sans", "Helvetica Neue", Arial, sans-serif',
+    color: C.textPrimary, background: C.offwhite, border: `1px solid ${C.cardBorder}`,
+    borderRadius: 6, boxSizing: "border-box" as const, cursor: "pointer",
   },
   submitButton: {
-    padding: "12px 24px", fontSize: 14, fontWeight: 600,
-    background: C.green, color: "#fff", border: "none",
-    borderRadius: 4, letterSpacing: "0.02em", marginTop: 4,
+    padding: "12px 28px", fontSize: 13, fontWeight: 700,
+    background: C.green, color: C.midnight, border: "none",
+    borderRadius: 40, letterSpacing: "0.08em", marginTop: 4,
+    textTransform: "uppercase" as const, cursor: "pointer",
   },
   exportCard: {
-    marginTop: 16, background: C.greenLight, border: `1px solid ${C.green}`,
-    borderRadius: 6, padding: "16px 20px", textAlign: "center" as const,
+    marginTop: 16, background: C.greenAlpha, border: `1px solid rgba(32,254,143,0.3)`,
+    borderRadius: 12, padding: "16px 20px", textAlign: "center" as const,
   },
   exportButton: {
-    width: "100%", padding: "12px 24px", fontSize: 14, fontWeight: 600,
-    background: C.green, color: "#fff", border: "none",
-    borderRadius: 4, cursor: "pointer", letterSpacing: "0.02em",
+    width: "100%", padding: "12px 28px", fontSize: 13, fontWeight: 700,
+    background: C.green, color: C.midnight, border: "none",
+    borderRadius: 40, cursor: "pointer", letterSpacing: "0.08em",
+    textTransform: "uppercase" as const,
   },
   exportNote: {
-    fontSize: 11, color: C.green, margin: "8px 0 0 0", fontWeight: 500,
+    fontSize: 11, color: C.violet, margin: "8px 0 0 0", fontWeight: 500,
+    letterSpacing: "0.04em",
   },
   rowList: { display: "flex", flexDirection: "column" as const, gap: 8 },
   removeBtn: {
     position: "absolute" as const, top: -6, right: -6,
     width: 22, height: 22, borderRadius: "50%",
-    background: "#e74c3c", color: "#fff", border: "none",
+    background: C.ember, color: C.midnight, border: "none",
     fontSize: 14, lineHeight: 1, cursor: "pointer",
     display: "flex", alignItems: "center", justifyContent: "center",
+    fontWeight: 700,
   },
   outputCard: {
-    background: C.cardBg, border: `1px solid ${C.cardBorder}`,
-    borderRadius: 6, padding: "24px 26px", minHeight: 260,
+    background: C.midnight, border: `1px solid ${C.cardBorder}`,
+    borderRadius: 12, padding: "24px 26px", minHeight: 260,
   },
   loadingState: {
     display: "flex", flexDirection: "column" as const,
@@ -698,38 +737,41 @@ const styles: Record<string, React.CSSProperties> = {
   loadingDots: { display: "flex", gap: 6 },
   dot: { fontSize: 14, color: C.green, animation: "pulse 1.2s ease-in-out infinite" },
   loadingText: {
-    fontSize: 14, fontWeight: 600, color: C.textPrimary,
+    fontSize: 14, fontWeight: 600, color: C.white,
     margin: 0, animation: "fadeIn 0.5s ease",
+    fontFamily: '"DM Sans", sans-serif',
   },
   loadingSubtext: {
-    fontSize: 12, color: C.textSecondary, margin: 0,
+    fontSize: 12, color: "rgba(255,255,255,0.45)", margin: 0,
     textAlign: "center" as const, maxWidth: 400, lineHeight: 1.5,
   },
   errorState: {
     display: "flex", flexDirection: "column" as const,
     alignItems: "center", gap: 12, padding: "40px 0",
   },
-  errorText: { fontSize: 14, color: "#c0392b", margin: 0, textAlign: "center" as const },
+  errorText: { fontSize: 14, color: C.ember, margin: 0, textAlign: "center" as const },
   retryButton: {
-    padding: "8px 20px", fontSize: 13, fontWeight: 600,
-    background: "transparent", color: C.textSecondary,
-    border: `1px solid ${C.cardBorder}`, borderRadius: 4, cursor: "pointer",
+    padding: "8px 24px", fontSize: 13, fontWeight: 600,
+    background: "transparent", color: "rgba(255,255,255,0.6)",
+    border: `1px solid rgba(84,93,255,0.4)`, borderRadius: 40, cursor: "pointer",
+    letterSpacing: "0.06em", textTransform: "uppercase" as const,
   },
   emptyState: {
     display: "flex", flexDirection: "column" as const,
     alignItems: "center", justifyContent: "center",
     minHeight: 200, gap: 12, padding: "20px 0",
   },
-  emptyTitle: { fontSize: 15, fontWeight: 600, color: C.textPrimary, margin: 0 },
+  emptyTitle: { fontSize: 15, fontWeight: 700, color: C.white, margin: 0 },
   emptyText: {
-    fontSize: 13, color: C.textSecondary, margin: 0,
+    fontSize: 13, color: "rgba(255,255,255,0.45)", margin: 0,
     textAlign: "center" as const, maxWidth: 500, lineHeight: 1.55,
   },
   flowDiagram: { display: "flex", alignItems: "center", gap: 10, marginTop: 8 },
   flowStep: {
     fontSize: 11, fontWeight: 600, padding: "6px 14px",
-    background: C.bg, border: `1px solid ${C.cardBorder}`,
-    borderRadius: 4, color: C.textPrimary, letterSpacing: "0.04em",
+    background: "rgba(84,93,255,0.15)", border: `1px solid rgba(84,93,255,0.3)`,
+    borderRadius: 6, color: "rgba(255,255,255,0.8)", letterSpacing: "0.06em",
+    textTransform: "uppercase" as const,
   },
-  flowArrow: { fontSize: 14, color: C.textSecondary },
+  flowArrow: { fontSize: 14, color: "rgba(255,255,255,0.25)" },
 };
